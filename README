@@ -1,0 +1,97 @@
+This program is used for communicating with monitor using DDC/CI interface.
+This program is GPLed and written by Oleg I. Vdovikin (oleg@cs.msu.su)
+
+Use i2cdetect to scan your DDC I2C buses first. Supported displays should
+respond at addresses 0x37 (DDC/CI) and 0x50 (EDID). Some displays are respond
+on VGA or DVI busses only, so check both.
+
+This program is based on info sniffed on wire and published in 
+
+USB Monitor Control Class 1.0 specification for control codes
+available at http://www.usb.org/developers/devclass_docs/usbmon10.pdf
+
+and
+
+ACCESS.bus (tm) Specifications Version 3.0 available at
+http://www.semtech.com/pdf/abusv30.pdf
+
+In fact, up to date information about DDC/CI standard (Display Data Channel 
+Command Interface (DDC/CI) Standard (formerly DDC2Bi), Version 1) is available
+from VESA (http://www.vesa.org) and the summary is freely available at
+http://www.vesa.org/summary/sumddcci.htm
+
+Tested with Samsung SyncMaster 173T (personally by me) with radeonfb and 
+Mitsubishi Diamond Pro 2060u (by Nicolas Boichat) with rivafb. Mitsubishi
+Diamond Pro 2060u does not support capabilities request.
+
+Usage:
+ddcci-tool [-a adr] [-e] [-d] [-c] [-f] [-v] [-s] [-S] [-r ctrl] [-w value] dev
+        dev: device, e.g. /dev/i2c-0
+        adr: base address of ddc/ci, eg 0x37 (def)
+        -e : query EDID at 0x50
+        	queries monitor EDID, which should be accessible at I2C address 0x50
+        -c : query capability
+        	queries DDC/CI capabilities string
+        -d : query ctrls 0 - 255
+        	dumps controls 0-255, checking validity byte, use -f to override
+        -r : query ctrl
+        	specifies control index to read or write (-w)
+        -w : value to write to ctrl
+        	value for control to be writen for index specified with -r
+        -f : force (avoid validity checks)
+        	avoid validity check
+        -s : save settings
+        	Sends DDC/CI command to save adjustments made by -w
+        -v : verbosity (specify more to increase)
+        	try -v and -vv (low level send/recv) for greater effect
+        -S : send Samsung DDC/CI enable
+        	seems some of the Samsung monitors requires this for operating
+
+Sample output:
+ddcci-tool version 0.03
+
+Reading EDID : 0x50@/dev/i2c-2
+	Plug and Play ID: SAM00BA
+	Input type: Analog
+
+Using ddc/ci : 0x37@/dev/i2c-2
+
+Capabilities:
+(type(LCD)vcp(04 05 06 08 0E 10 12 16 18 1A 1E 20 30 3E 60(1 3) B0(1 2) B6 C6 C8 C9 D6(1 4) DC(1 2 3 4) DF E0(0 1 2)))
+
+Controls (valid/current/max):
+Control 0x04: +/0/1	[Reset Factory Defaults]
+Control 0x05: +/0/1	[SAM: Reset Brightness and Contrast]
+Control 0x06: +/0/1	[Reset Factory Geometry]
+Control 0x08: +/0/1	[Reset Factory Default Color]
+Control 0x0e: +/60/120	[SAM: Image Lock Coarse]
+Control 0x10: +/0/100	[Brightness]
+Control 0x12: +/50/100	[Contrast]
+Control 0x16: +/8/16	[Red Video Gain]
+Control 0x18: +/8/16	[Green Video Gain]
+Control 0x1a: +/8/16	[Blue Video Gain]
+Control 0x1e: +/0/2	[SAM: Auto Size Center]
+Control 0x20: +/50/100	[Horizontal Position]
+Control 0x30: +/25/54	[Vertical Position]
+Control 0x3e: +/39/50	[SAM: Image Lock Fine]
+Control 0x60: +/1/3	[Input Source Select]
+Control 0x62: +/0/100	[Audio Speaker Volume Adjust]
+Control 0x6c: +/140/255	[Red Video Black Level]
+Control 0x6e: +/127/255	[Green Video Black Level]
+Control 0x70: +/121/255	[Blue Video Black Level]
+Control 0xb0: +/0/2	[Settings]
+Control 0xb6: +/3/8	[???]
+Control 0xc6: +/1/1	[???]
+Control 0xc8: +/5/16	[???]
+Control 0xc9: +/1/0	[???]
+Control 0xca: +/2/2	[On Screen Display]
+Control 0xcc: +/2/11	[SAM: On Screen Display Language]
+Control 0xd6: +/1/4	[SAM: DPMS control (1 - on/4 - stby)]
+Control 0xdc: +/4/4	[SAM: MagicBright (1 - text/2 - internet/3 - entertain/4 - custom)]
+Control 0xdf: +/512/0	[VCP Version]
+Control 0xe0: +/0/2	[SAM: Color preset (0 - normal/1 - warm/2 - cool)]
+Control 0xe1: +/1/1	[SAM: Power control (0 - off/1 - on)]
+Control 0xe2: +/0/1	[???]
+Control 0xed: +/108/255	[SAM: Red Video Black Level]
+Control 0xee: +/101/255	[SAM: Green Video Black Level]
+Control 0xef: +/103/255	[SAM: Blue Video Black Level]
