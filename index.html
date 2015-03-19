@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="ddcci : Controlling DDC/CI monitors using command line interface">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>ddcci</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/bhuvanchandra/ddcci">View on GitHub</a>
+
+          <h1 id="project_title">ddcci</h1>
+          <h2 id="project_tagline">Controlling DDC/CI monitors using command line interface</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/bhuvanchandra/ddcci/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/bhuvanchandra/ddcci/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a id="linux-ddcci-tool-page" class="anchor" href="#linux-ddcci-tool-page" aria-hidden="true"><span class="octicon octicon-link"></span></a>Linux DDC/CI Tool page</h3>
+
+<p>DDC/CI device is a client at I2C bus address 0x37. Data being sent/received is formatted in frame, each frame has a fixed prefix byte, followed by length of the payload, payload itself and checksum made of XORing submitted/received I2C message.  The initial XOR value depends on operation attempted, it's equal to I2C address submitted on the wire and seems to be fixed value for read transaction. For details see ddcci-tool sources.</p>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>ddcci-tool /dev/i2c-X -e -c -d</p>
+
+<p>This should produce output like this:</p>
+
+<p>ddcci-tool version 0.03</p>
+
+<p>Reading EDID : 0x50@/dev/i2c-2
+    Plug and Play ID: SAM00BA
+    Input type: Analog</p>
+
+<p>Using ddc/ci : 0x37@/dev/i2c-2</p>
+
+<p>Capabilities:
+(type(LCD)vcp(04 05 10 12 60(1 3) B0(1 2) B6 C6 C8 C9 D6(1 4) DC(1 2 3 4) DF))</p>
+
+<ul>
+<li>Controls (valid/current/max):</li>
+<li>Control 0x04: +/0/1   [Reset Factory Defaults]</li>
+<li>Control 0x05: +/0/1   [SAM: Reset Brightness and Contrast]</li>
+<li>Control 0x06: +/0/1   [Reset Factory Geometry]</li>
+<li>Control 0x08: +/0/1   [Reset Factory Default Color]</li>
+<li>Control 0x0e: +/60/120    [SAM: Image Lock Coarse]</li>
+<li>Control 0x10: +/0/100 [Brightness]</li>
+<li>Control 0x12: +/50/100    [Contrast]</li>
+<li>Control 0x16: +/8/16  [Red Video Gain]</li>
+<li>Control 0x18: +/8/16  [Green Video Gain]</li>
+<li>Control 0x1a: +/8/16  [Blue Video Gain]</li>
+<li>Control 0x1e: +/0/2   [SAM: Auto Size Center]</li>
+<li>Control 0x20: +/50/100    [Horizontal Position]</li>
+<li>Control 0x30: +/25/54 [Vertical Position]</li>
+<li>Control 0x3e: +/39/50 [SAM: Image Lock Fine]</li>
+<li>Control 0x60: +/1/3   [Input Source Select]</li>
+<li>Control 0x62: +/0/100 [Audio Speaker Volume Adjust]</li>
+<li>Control 0x6c: +/140/255   [Red Video Black Level]</li>
+<li>Control 0x6e: +/127/255   [Green Video Black Level]</li>
+<li>Control 0x70: +/121/255   [Blue Video Black Level]</li>
+<li>Control 0xb0: +/0/2   [Settings]</li>
+<li>Control 0xb6: +/3/8   [???]</li>
+<li>Control 0xc6: +/1/1   [???]</li>
+<li>Control 0xc8: +/5/16  [???]</li>
+<li>Control 0xc9: +/1/0   [???]</li>
+<li>Control 0xca: +/2/2   [On Screen Display]</li>
+<li>Control 0xcc: +/2/11  [SAM: On Screen Display Language]</li>
+<li>Control 0xd6: +/1/4   [SAM: DPMS control (1 - on/4 - stby)]</li>
+<li>Control 0xdc: +/4/4   [SAM: MagicBright (1 - text/2 - internet/3 - entertain/4 - custom)]</li>
+<li>Control 0xdf: +/512/0 [VCP Version]</li>
+<li>Control 0xe0: +/0/2   [SAM: Color preset (0 - normal/1 - warm/2 - cool)]</li>
+<li>Control 0xe1: +/1/1   [SAM: Power control (0 - off/1 - on)]</li>
+<li>Control 0xe2: +/0/1   [???]</li>
+<li>Control 0xed: +/108/255   [SAM: Red Video Black Level]</li>
+<li>Control 0xee: +/101/255   [SAM: Green Video Black Level]</li>
+<li>Control 0xef: +/103/255   [SAM: Blue Video Black Level]</li>
+</ul>
+
+<p>If you got this - congratulations, if not, try digging inside it. If it hangs - press Ctrl+C. At the moment I do not accept anything other than patches. ;-) The output is not decoded at the moment, but the meaning as follows - vcp section contains list of controls which can be adjusted. Some controls are descrete, i.e. they can be one of the value specified in the list which follows them. See Controls section below for decoding numbers. The caps string are depends on the mode in which monitor is being used at the time of running. I.e. the the output was produced, when I've switched my SM173T to digital (DVI) input, while analog (VGA) mode produces the following:</p>
+
+<p>(type(LCD)vcp(04 05 06 08 0E 10 12 16 18 1A 1E 20 30 3E 60(1 3) 
+            B0(1 2) B6 C6 C8 C9 D6(1 4) DC(1 2 3 4) DF E0(0 1 2)))</p>
+
+<p>(line brake inserted for readability).</p>
+
+<p>Another program options are -d for querying all available controls (which includes also "hidden" controls), -r for reading specific control, -w for writing it. For example to query current brightness execute this command:</p>
+
+<p>ddcci-tool /dev/i2c-X -r 0x10</p>
+
+<p>This should produce output like this: </p>
+
+<p>Reading 0x10(Brightness)
+Control 0x10: +/0/100   [Brightness]</p>
+
+<p>The meaning is following - control number, validity (+ sign), current value, maximum value and symbolic name. To set brightness to 50 type this:</p>
+
+<p><code>ddcci-tool /dev/i2c-2 -r 0x10 -w 50</code></p>
+
+<p>Launch ddcci-tool with no args to see available options. At the moment of writing they're as follows</p>
+
+<ul>
+<li>ddcci-tool [-a adr] [-e] [-d] [-c] [-f] [-v] [-s] [-S] [-r ctrl] [-w value] dev
+     dev: device, e.g. /dev/i2c-0
+     adr: base address of ddc/ci, eg 0x37 (def)</li>
+<li>        -e : query EDID at 0x50
+        queries monitor EDID, which should be accessible at I2C address 0x50</li>
+<li>        -c : query capability
+        queries DDC/CI capabilities string</li>
+<li>        -d : query ctrls 0 - 255
+        dumps controls 0-255, checking validity byte, use -f to override</li>
+<li>        -r : query ctrl
+        specifies control index to read or write (-w)</li>
+<li>        -w : value to write to ctrl
+        value for control to be writen for index specified with -r</li>
+<li>        -f : force (avoid validity checks)
+        avoid validity check</li>
+<li>        -s : save settings
+        Sends DDC/CI command to save adjustments made by -w</li>
+<li>        -v : verbosity (specify more to increase)
+        try -v and -vv (low level send/recv) for greater effect</li>
+<li>        -S : send Samsung DDC/CI enable seems some of the Samsung monitors requires this for operating</li>
+</ul>
+
+<h3>
+<a id="sm173t-controls" class="anchor" href="#sm173t-controls" aria-hidden="true"><span class="octicon octicon-link"></span></a>SM173T Controls</h3>
+
+<p>At the moment program show symbolic control names according to Samsung SyncMaster 173T functionality and info gathered from USB &amp; ACCESS.bus specs, so they could be incorrect for your monitor.</p>
+
+<ul>
+<li>Control   Symbolic name   Comments</li>
+<li>0x00  Degauss ACCESS.bus</li>
+<li>0x01  Degauss USB</li>
+<li>0x02  Secondary Degauss   ACCESS.bus</li>
+<li>0x04  Reset Factory Defaults  Both</li>
+<li>0x05  SAM: Reset Brightness and Contrast  Sniffed</li>
+<li>0x06  Reset Factory Geometry  Both</li>
+<li>0x08  Reset Factory Default Color ACCESS.bus</li>
+<li>0x0a  Reset Factory Default Position  ACCESS.bus</li>
+<li>0x0c  Reset Factory Default Size  ACCESS.bus</li>
+<li>0x0e  SAM: Image Lock Coarse  Sniffed</li>
+<li>0x10  Brightness  Both</li>
+<li>0x12  Contrast    Both</li>
+<li>0x14  Select Color Preset ACCESS.bus</li>
+<li>0x16  Red Video Gain  Both</li>
+<li>0x18  Green Video Gain    Both</li>
+<li>0x1a  Blue Video Gain Both</li>
+<li>0x1c  Focus   ACCESS.bus</li>
+<li>0x1e  SAM: Auto Size Center   Sniffed</li>
+<li>0x20  Horizontal Position Both</li>
+<li>0x22  Horizontal Size Both</li>
+<li>0x24  Horizontal Pincushion   Both</li>
+<li>0x26  Horizontal Pincushion Balance   Both</li>
+<li>0x28  Horizontal Misconvergence   Both</li>
+<li>0x2a  Horizontal Linearity    Both</li>
+<li>0x2c  Horizontal Linearity Balance    Both</li>
+<li>0x30  Vertical Position   Both</li>
+<li>0x32  Vertical Size   Both</li>
+<li>0x34  Vertical Pincushion Both</li>
+<li>0x36  Vertical Pincushion Balance Both</li>
+<li>0x38  Vertical Misconvergence Both</li>
+<li>0x3a  Vertical Linearity  Both</li>
+<li>0x3c  Vertical Linearity Balance  Both</li>
+<li>0x3e  SAM: Image Lock Fine    Sniffed</li>
+<li>0x40  Parallelogram Distortion    Both</li>
+<li>0x42  Trapezoidal Distortion  Both</li>
+<li>0x44  Tilt (Rotation) Both</li>
+<li>0x46  Top Corner Distortion Control   Both</li>
+<li>0x48  Top Corner Distortion Balance   Both</li>
+<li>0x4a  Bottom Corner Distortion Control    Both</li>
+<li>0x4c  Bottom Corner Distortion Balance    Both</li>
+<li>0x50  Hue ACCESS.bus</li>
+<li>0x52  Saturation  ACCESS.bus</li>
+<li>0x54  Color Curve Adjust  ACCESS.bus</li>
+<li>0x56  Horizontal Moire    Both</li>
+<li>0x58  Vertical Moire  Both</li>
+<li>0x5a  Auto Size Center Enable/Disable ACCESS.bus</li>
+<li>0x5c  Landing Adjust  ACCESS.bus</li>
+<li>0x5e  Input Level Select  ACCESS.bus</li>
+<li>0x60  Input Source Select Both</li>
+<li>0x62  Audio Speaker Volume Adjust ACCESS.bus</li>
+<li>0x64  Audio Microphone Volume Adjust  ACCESS.bus</li>
+<li>0x66  On Screen Display Enable/Disable    ACCESS.bus</li>
+<li>0x68  Language Select ACCESS.bus</li>
+<li>0x6c  Red Video Black Level   Both</li>
+<li>0x6e  Green Video Black Level Both</li>
+<li>0x70  Blue Video Black Level  Both</li>
+<li>0xa2  Auto Size Center    USB</li>
+<li>0xa4  Polarity Horizontal Synchronization USB</li>
+<li>0xa6  Polarity Vertical Synchronization   USB</li>
+<li>0xa8  Synchronization Type    USB</li>
+<li>0xaa  Screen Orientation  USB</li>
+<li>0xac  Horizontal Frequency    USB</li>
+<li>0xae  Vertical Frequency  USB</li>
+<li>0xb0  Settings    Both</li>
+<li>0xca  On Screen Display   USB</li>
+<li>0xcc  SAM: On Screen Display Language Sniffed</li>
+<li>0xd4  Stereo Mode USB</li>
+<li>0xd6  SAM: DPMS control   Sniffed (1 - on/4 - stby)</li>
+<li>0xdc  SAM: MagicBright    Sniffed (1 - text/2 - internet/3 - entertain/4 - custom)</li>
+<li>0xdf  VCP Version </li>
+<li>0xe0  SAM: Color preset   Sniffed (0 - normal/1 - warm/2 - cool)</li>
+<li>0xe1  SAM: Power control  Sniffed (0 - off/1 - on)</li>
+<li>0xed  SAM: Red Video Black Level  Sniffed</li>
+<li>0xee  SAM: Green Video Black Level    Sniffed</li>
+<li>0xef  SAM: Blue Video Black Level Sniffed</li>
+<li>0xf5  SAM: VCP Enable Sniffed</li>
+</ul>
+
+<h3>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h3>
+
+<p><a href="http://jaffar.cs.msu.su/oleg/ddcci/">http://jaffar.cs.msu.su/oleg/ddcci/</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ddcci maintained by <a href="https://github.com/bhuvanchandra">bhuvanchandra</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
