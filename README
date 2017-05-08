@@ -8,12 +8,12 @@ on VGA or DVI busses only, so check both.
 This program is based on info sniffed on wire and published in 
 
 USB Monitor Control Class 1.0 specification for control codes
-available at http://www.usb.org/developers/devclass_docs/usbmon10.pdf
+available at http://www.usb.org/developers/hidpage/usbmon10.pdf
 
 and
 
 ACCESS.bus (tm) Specifications Version 3.0 available at
-http://www.semtech.com/pdf/abusv30.pdf
+http://measure.feld.cvut.cz/groups/micro/soucastky/spec/serial_p/Access_bus_spec_3_0.pdf
 
 In fact, up to date information about DDC/CI standard (Display Data Channel 
 Command Interface (DDC/CI) Standard (formerly DDC2Bi), Version 1) is available
